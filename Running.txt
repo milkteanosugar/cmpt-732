@@ -1,0 +1,67 @@
+Running Intructions:
+
+Layer 1: Query Dataset: 
+1. Install Libraries
+cd load_data
+pip install --upgrade --user setuptools
+pip install --upgrade --user pyasn1
+pip install --upgrade google-cloud-bigquery
+
+All the following already been set up in britneyt@gateway.sfucloud.ca
+2. Fetching Data:
+python import_dataset.py
+
+The above command will take 2-3 hours pull the data. As
+an alternative for testing, we prepared a fetched data
+in https://drive.google.com/drive/folders/1YmHJwR3xzXCQQiQEnZV2IKUQux_M6MXg?usp=sharing.
+Please download it to ./load_data/data folder
+tripsl.csv    ->   bike trips data   6GB
+station_df.csv  -> bike station data 48.2kb
+taxi.csv    -> taxi trips data  4GB
+
+3.upload them to cluster
+
+scp load_data/data/* brtineyt@gateway.sfuloud.ca:  #Please change the username needed
+ssh britneyt@gateway.sfucloud.ca
+hdfs dfs -copyFromLocal tripsl.csv    
+hdfs dfs -copyFromLocal station_df.csv
+hdfs dfs -copyFromLocal taxi.csv
+
+4. making needed directories in gateway
+mkdir data
+mkdir data/q1_data
+mkdir data/q1_data/2013
+mkdir data/q1_data/2014
+mkdir data/q1_data/2015
+mkdir data/q1_data/2016
+mkdir data/q2_data
+mkdir data/q3_data
+
+
+Layer 2: Running back-end scripts and queries
+
+scp spark/* britneyt@gateway.sfucloud.ca:  #Please change the username needed
+ssh britneyt@gateway.sfucloud.ca
+chmod 777 run.sh
+./run.sh #includs all the spark-submit command
+
+Layer 3: Updating front-end UI data
+cd ui
+python update_data.py 
+#note in this file,the ssh user name is set to britneyt
+#If you do the above under your username, Please modify
+#the user name to your own
+
+Layer 4: Open front-end UI
+cd ui
+pip install dash
+python q1.py
+python q2.py
+python q3.py
+
+
+
+
+
+
+
